@@ -1,0 +1,30 @@
+version: '3'
+services:
+    php:
+      build:
+        context: ./images/php
+      volumes:
+        - ./www:/var/www
+        - ./www/config/supervisor:/etc/supervisor
+      environment:
+        XDEBUG_CONFIG: "remote_host=127.0.0.1 remote_enable=1 remote_autostart=off remote_port=9008"
+        PHP_IDE_CONFIG: "serverName=luckyads"
+    nginx:
+      image: nginx
+      volumes:
+        - ./images/php/hosts:/etc/nginx/conf.d
+        - ./www:/var/www
+        - ./logs:/var/log/nginx
+      ports:
+        - "8055:80"
+      depends_on:
+        - php
+    db:
+      image: postgres
+      working_dir: /application
+      volumes:
+        - ./images/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+        - .:/application
+      restart: always
+      environment:
+        POSTGRES_PASSWORD: password
