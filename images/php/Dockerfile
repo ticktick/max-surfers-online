@@ -9,6 +9,9 @@ RUN apt-get install -y libpq-dev supervisor \
     && docker-php-ext-install pdo pdo_pgsql pgsql
 
 ADD ./php.ini /usr/local/etc/php/php.ini
+ADD ./entrypoint.sh /var/entrypoint.sh
+
+RUN chmod u+x /var/entrypoint.sh
 
 RUN wget https://getcomposer.org/installer -O - -q \
     | php -- --install-dir=/bin --filename=composer --quiet
@@ -16,4 +19,4 @@ RUN wget https://getcomposer.org/installer -O - -q \
 
 WORKDIR /var/www
 
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
+CMD ["/var/entrypoint.sh"]
